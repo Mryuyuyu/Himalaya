@@ -23,9 +23,10 @@ import net.lucode.hackware.magicindicator.buildins.commonnavigator.titles.Simple
 public class IndicatorAdapter extends CommonNavigatorAdapter {
 
     private final String[] mtitles;
+    private OnIndicatorTapClickListener mOnTapClickListener;
 
     public IndicatorAdapter(Context context){
-        mtitles = context.getResources().getStringArray(R.array.indicator_name);
+        mtitles = context.getResources().getStringArray(R.array.indicator_title);
 
     }
     @Override
@@ -38,25 +39,41 @@ public class IndicatorAdapter extends CommonNavigatorAdapter {
 
     @Override
     public IPagerTitleView getTitleView(Context context, final int index) {
-        SimplePagerTitleView simplePagerTitleView = new ColorTransitionPagerTitleView(context);
-        simplePagerTitleView.setNormalColor(Color.GRAY);
-        simplePagerTitleView.setSelectedColor(Color.WHITE);
-        simplePagerTitleView.setText(mtitles[index]);
-        simplePagerTitleView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //mViewPager.setCurrentItem(index);
-                //TODO
+        //创建view
+        ColorTransitionPagerTitleView colorTransitionPagerTitleView=new ColorTransitionPagerTitleView(context);
+        //设置一般情况下的颜色为灰创
+        colorTransitionPagerTitleView.setNormalColor(Color.parseColor("#aaffffff"));
+        //设置选中情况下的颜色为黑色
+        colorTransitionPagerTitleView.setSelectedColor(Color.parseColor("#ffffff"));
+        //单位sp
+        colorTransitionPagerTitleView.setText(mtitles[index]);
+        //设置title的点击事件，这里的话，如果点击了title，那么就选中下面的viewPager到对应的index里面去
+        //也就是说，当我们点击了title的时候，下面的viewPager会对应着index进行切换内容。
+        colorTransitionPagerTitleView.setOnClickListener(new View.OnClickListener(){
+        @Override
+        public void onClick(View view){
+        //切换viewPager的内容，如果index不一样的话。
+            if (mOnTapClickListener != null) {
+                mOnTapClickListener.onTapClick(index);
+            }
             }
         });
-        return simplePagerTitleView;
+        return colorTransitionPagerTitleView;
     }
 
     @Override
     public IPagerIndicator getIndicator(Context context) {
         LinePagerIndicator linePagerIndicator = new LinePagerIndicator(context);
         linePagerIndicator.setMode(LinePagerIndicator.MODE_WRAP_CONTENT);
-        linePagerIndicator.setColors(Color.WHITE);
+        linePagerIndicator.setColors(Color.parseColor("#ffffff"));
         return linePagerIndicator;
+    }
+
+    public void setOnIndicatorTapClickListener(OnIndicatorTapClickListener listener){
+        this.mOnTapClickListener = listener;
+    }
+
+    public interface OnIndicatorTapClickListener{
+        void onTapClick(int index);
     }
 }
